@@ -1,0 +1,49 @@
+AllCops:
+  TargetRubyVersion: 2.5.3
+  DisplayCopNames: true
+  Exclude:
+    - '**/Gemfile'
+    - '**/Rakefile'
+    - '**/*.gemspec'
+
+Documentation:
+  Enabled: false
+
+ClassLength:
+  Max: 150
+
+Metrics/AbcSize:
+  Max: 20
+
+Metrics/BlockLength:
+  Exclude:
+    - '**/spec/**/*.rb'
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/PerceivedComplexity:
+  Max: 10
+
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Style/RegexpLiteral:
+  EnforcedStyle: percent_r
+
+Rails/HasAndBelongsToMany:
+  Enabled: false
+
+Rails/InverseOf:
+  Enabled: false
+
+Naming/UncommunicativeMethodParamName:
+  AllowedNames:
+    - '_'
+
+Style/MixinUsage:
+  Exclude:
+    - 'bin/*'

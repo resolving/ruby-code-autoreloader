@@ -1,0 +1,14 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.5.1-node
+    steps:
+      - checkout
+      - run: gem install bundle
+      - run:
+          name: Bundle Install
+          command: bundle check || bundle install
+      - run:
+          name: Run Specs
+          command: bundle exec rspec --format progress

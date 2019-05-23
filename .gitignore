@@ -1,0 +1,36 @@
+.bundle/
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# ruby version files
+.ruby-*
+
+# rspec configs
+.rspec
+
+# dotenv files
+.env
+.env.test
+
+# Ignore rubymine files.
+.idea
+
+.DS_Store
+.vimrc
+# vim ignores
+# swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]
+# session
+Session.vim
+# temporary
+.netrwhist
+*~
+# auto-generated tag files
+tags
+
+.byebug_history
