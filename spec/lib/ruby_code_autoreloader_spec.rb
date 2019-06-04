@@ -3,15 +3,17 @@
 require 'spec_helper'
 
 RSpec.describe RubyCodeAutoreloader do
-  let(:classes_should_be_loaded) { ['TestClasses::FooClass', 'TestClasses::TestClass'] }
-  let(:autoloadable_paths) { ['spec/support/test_classes'] }
+  let(:classes_should_be_loaded) do
+    %w(TestClasses::DirectClass TestClasses::FooClass TestClasses::TestClass)
+  end
+  let(:autoloadable_paths) { ['spec/support/direct_class.rb', 'spec/support/test_classes'] }
   let(:config) do
     {
       autoloadable_paths: autoloadable_paths,
       autoreload_enabled: true
     }
   end
-  
+
   describe '#config' do
     it 'returns default config for not initiated module' do
       expect(subject.config).to be_kind_of(RubyCodeAutoreloader::Config)
@@ -45,7 +47,7 @@ RSpec.describe RubyCodeAutoreloader do
       expect(subject.config.file_watchers).to be_empty
       expect(subject.all_autoloaded_classes).to be_empty
       expect(ActiveSupport::Dependencies.mechanism).to eq(:load)
-      
+
       subject.start
 
       expect(subject.config.file_watchers).not_to be_empty
@@ -61,11 +63,11 @@ RSpec.describe RubyCodeAutoreloader do
       subject.start
 
       expect(subject.all_autoloaded_classes).to match(classes_should_be_loaded)
-      
+
       subject.clear
-      
+
       expect(subject.config.file_watchers).not_to be_empty
-      
+
       expect(subject.instance_variable_get("@existing_modules_before_load")).to be_empty
       expect(subject.instance_variable_get("@autoloaded_files")).to be_empty
       expect(subject.all_autoloaded_classes).to be_empty
@@ -79,7 +81,7 @@ RSpec.describe RubyCodeAutoreloader do
       expect(subject.all_autoloaded_classes).to be_empty
 
       subject.load_paths
-      
+
       expect(subject.all_autoloaded_classes).to match(classes_should_be_loaded)
     ensure
       subject.clear
@@ -94,14 +96,14 @@ RSpec.describe RubyCodeAutoreloader do
         reload_only_on_change: false
       }
     end
-    
+
     let(:tmp_dir) { 'tmp' }
     let(:test_file_path) { "#{tmp_dir}/test_module.rb" }
     let(:new_method_result) { 'Hi from new method' }
     let(:test_module) { 'TestModule' }
     let(:new_method) { 'hello' }
     let(:classes_should_be_loaded) { [test_module] }
-    
+
     before do
       Dir.mkdir(tmp_dir) unless Dir.exist?(tmp_dir)
       file = File.new(test_file_path, 'w')
@@ -117,11 +119,11 @@ RSpec.describe RubyCodeAutoreloader do
       File.delete(test_file_path) if File.file?(test_file_path)
       Dir.rmdir(tmp_dir) if Dir.exist?(tmp_dir)
     end
-    
+
     it 'reloads files from the given paths' do
       subject.configure(config_always_reload)
       subject.start
-      
+
       expect(subject.all_autoloaded_classes).to match(classes_should_be_loaded)
 
       # Change new file in tmp folder, add new method
@@ -135,12 +137,12 @@ RSpec.describe RubyCodeAutoreloader do
       ensure
         file.close unless file.nil?
       end
-      
+
       # Trying to call this new method from the loaded test class. It should raise an Error
       expect { test_module.constantize.send(new_method.to_sym) }.to raise_error(NameError)
-      
+
       subject.reload
-      
+
       # Try to call some  method from the loaded test class. It should return some test string
       expect(test_module.constantize.send(new_method.to_sym)).to eq(new_method_result)
     ensure
