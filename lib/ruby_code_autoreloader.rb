@@ -28,13 +28,12 @@ module RubyCodeAutoreloader
 
   def load_paths
     @config.autoloadable_paths.each do |path|
-      Dir.glob("#{path}/**/*.rb").each do |file|
-        @existing_modules_before_load = ObjectSpace.each_object(Module).to_a
-        require_or_load(file)
-        RubyCodeAutoreloader::ClassLoader.update_autoloaded_classes(file,
-                                                                    @autoloaded_classes,
-                                                                    @existing_modules_before_load)
-        @autoloaded_files << file
+      if path.end_with?('.rb')
+        load_file(path)
+      else
+        Dir.glob("#{path}/**/*.rb").each do |file|
+          load_file(file)
+        end
       end
     end
 
@@ -77,6 +76,15 @@ module RubyCodeAutoreloader
     @existing_modules_before_load = []
     @autoloaded_classes = Set.new
     @autoloaded_files = []
+  end
+
+  def self.load_file(file)
+    @existing_modules_before_load = ObjectSpace.each_object(Module).to_a
+    require_or_load(file)
+    RubyCodeAutoreloader::ClassLoader.update_autoloaded_classes(file,
+                                                                @autoloaded_classes,
+                                                                @existing_modules_before_load)
+    @autoloaded_files << file
   end
 
   def self.set_reloader

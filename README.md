@@ -35,7 +35,7 @@ List of possible params:
 | --- | :---: | --- |
 |  default_file_watcher | ActiveSupport::FileUpdateChecker | File watcher class that will be used for checking files  updates |
 |  autoreload_enabled | ENV['RACK_ENV'] == 'development' | The code reloading will works only if this param is `true`. Then all libs specified in `autoloadable_paths` will be loaded with `load`  directive, e.g. `load 'lib_path/file.rb'`. If this param  is `false`, then all libs specified in `autoloadable_paths`  will be loaded as usual with `require`. Loading process uses the `ActiveSupport::Dependencies::Loadable.require_or_load` method |
-|  autoloadable_paths | [] | This is an `Array` of paths from which will be loaded all  ruby files `'*.rb'`. All files and Classes should be in the compliance with the [`Naming convention`](#naming-convention)  described below. |
+|  autoloadable_paths | [] | This is an `Array` of paths to files or folders from which will be loaded all  ruby files `'*.rb'`. All files and Classes should be in the compliance with the [`Naming convention`](#naming-convention)  described below. |
 |  reload_only_on_change | TRUE | If this is `true`, then Reloader will check files in `autoloadable_paths` with initialized  `file_watcher` and will reload the files if any of them was  updated. If this is `false`, then files will be reloaded on  each `RubyCodeAutoreloader.reload` method call,  e.g. always |
 |  logger | Logger.new(STDOUT) | Logger object |                        
 
@@ -52,6 +52,7 @@ RubyCodeAutoreloader.configure(autoreload_enabled: (ENV['RACK_ENV'] == 'developm
                                reload_only_on_change: false,
                                autoloadable_paths: %w(app/endpoint_flux/middlewares/decorator
                                                       app/endpoint_flux/middlewares/validator
+                                                      app/endpoint_flux/validations/concern/error.rb
                                                       app/models
                                                       app/endpoint_flux/decorators
                                                       app/endpoint_flux/endpoints
@@ -62,6 +63,7 @@ RubyCodeAutoreloader.configure(autoreload_enabled: (ENV['RACK_ENV'] == 'developm
 
 `RubyCodeAutoreloader` will search for all ruby `"*.rb"` files inside directories that described in `autoloadable_paths`.
 The pattern for searching files is `Dir.glob("#{path}/**/*.rb")`, e.g. will be loaded all files from subdirectories too.
+Or you can define the direct file path, for example `app/endpoint_flux/validations/concern/error.rb`.
 Each file will be loaded by `load` or `require` directive, depends on `autoreload_enabled` mode. After each file loading,
 `RubyCodeAutoreloader` will accumulate loaded Classes/Modules inside module variable `@autoloaded_classes`, that will be
 used to remove constant before each `Reloading`. 
@@ -70,7 +72,8 @@ And here we have a special `Naming convention`:
 the **_Classes/Modules_** that will be used for `Reloading` (e.g. will be added to `autoloaded_classes`), **should have** 
 **the same last module names** as the **`files name`** too. **Otherwise** it will not be included for `Reloading` and 
 **will be loaded only once** at the start. 
-That's because it's hard to track what modules was loaded from the file as they might have their own `require` libs inside.
+That's because it's hard to track what modules/classes was loaded from the file as they might have their own hidden dependencies/libs inside,
+and we can't track in what path they were defined.
 
 For example we have this file `app/endpoint_flux/endpoints/users/create.rb` in specified dir `app/endpoint_flux/endpoints`, 
 then Class/Module defined inside should has the name `Create` as **the last module name**, 
