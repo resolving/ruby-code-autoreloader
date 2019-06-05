@@ -79,12 +79,16 @@ module RubyCodeAutoreloader
   end
 
   def self.load_file(file)
-    @existing_modules_before_load = ObjectSpace.each_object(Module).to_a
-    require_or_load(file)
-    RubyCodeAutoreloader::ClassLoader.update_autoloaded_classes(file,
-                                                                @autoloaded_classes,
-                                                                @existing_modules_before_load)
-    @autoloaded_files << file
+    if autoreload_enabled?
+      @existing_modules_before_load = ObjectSpace.each_object(Module).to_a
+      require_or_load(file)
+      RubyCodeAutoreloader::ClassLoader.update_autoloaded_classes(file,
+                                                                  @autoloaded_classes,
+                                                                  @existing_modules_before_load)
+      @autoloaded_files << file
+    else
+      require_or_load(file)
+    end
   end
 
   def self.set_reloader
