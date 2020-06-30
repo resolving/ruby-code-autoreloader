@@ -140,7 +140,7 @@ end
 
 ## [Contributing](CONTRIBUTING.md)
 
-### [Maintainers](https://github.com/resolving/endpoint-flux/graphs/contributors)
+### [Maintainers](https://github.com/resolving/ruby-code-autoreloader/graphs/contributors)
 
 
 ## License
